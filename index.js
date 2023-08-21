@@ -6,7 +6,7 @@ canvas.height = 576
 
 ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-const gravity = 0.2
+const gravity = 0.7
 
 // creates a class for the player/enemy
 class Sprite {
@@ -77,8 +77,6 @@ const keys = {
   },
 }
 
-let lastkey
-
 // mainloop for the game
 function animate() {
   window.requestAnimationFrame(animate)
@@ -90,19 +88,19 @@ function animate() {
   player.velocity.x = 0
 
   //player movement
-  if (keys.a.pressed && lastkey === 'a') {
-    player.velocity.x = -1
-  } else if (keys.d.pressed && lastkey === 'd') {
-    player.velocity.x = 1
+  if (keys.a.pressed && player.lastkey === 'a') {
+    player.velocity.x = -5
+  } else if (keys.d.pressed && player.lastkey === 'd') {
+    player.velocity.x = 5
   }
 
   enemy.velocity.x = 0
 
   //enemy movement
   if (keys.left.pressed && enemy.lastkey === 'left') {
-    enemy.velocity.x = -1
+    enemy.velocity.x = -5
   } else if (keys.right.pressed && enemy.lastkey === 'right') {
-    enemy.velocity.x = 1
+    enemy.velocity.x = 5
   }
 }
 
@@ -113,14 +111,14 @@ window.addEventListener('keydown', (event) => {
   switch (event.key) {
     case 'd':
       keys.d.pressed = true
-      lastkey = 'd'
+      player.lastkey = 'd'
       break
     case 'a':
       keys.a.pressed = true
-      lastkey = 'a'
+      player.lastkey = 'a'
       break
     case 'w':
-      player.velocity.y = -10
+      player.velocity.y = -20
       break
 
     case 'ArrowRight':
@@ -132,7 +130,7 @@ window.addEventListener('keydown', (event) => {
       enemy.lastkey = 'left'
       break
     case 'ArrowUp':
-      enemy.velocity.y = -10
+      enemy.velocity.y = -20
       break
   }
   console.log(event.key)
