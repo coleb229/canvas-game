@@ -1,8 +1,8 @@
 const canvas = document.querySelector('canvas')
 const ctx = canvas.getContext('2d')
 
-canvas.width = 1024
-canvas.height = 576
+canvas.width = window.innerWidth
+canvas.height = window.innerHeight
 
 ctx.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -10,16 +10,35 @@ const gravity = 0.7
 
 // creates a class for the player/enemy
 class Sprite {
-  constructor({ position, velocity }) {
+  constructor({ position, velocity, color = 'red' }) {
     this.position = position
     this.velocity = velocity
+    this.width = 50
     this.height = 150
     this.lastkey
+    this.attackBox = {
+      position: this.position,
+      width: 100,
+      height: 50,
+    }
+    this.color = color
+    this.isAttacking
   }
 
   draw() {
-    ctx.fillStyle = 'red'
-    ctx.fillRect(this.position.x, this.position.y, 50, this.height)
+    ctx.fillStyle = this.color
+    ctx.fillRect(this.position.x, this.position.y, this.width, this.height)
+
+    //attack box
+    if (this.isAttacking) {
+      ctx.fillStyle = 'green'
+      ctx.fillRect(
+        this.position.x,
+        this.position.y,
+        this.attackBox.width,
+        this.attackBox.height,
+      )
+    }
   }
 
   update() {
@@ -32,6 +51,13 @@ class Sprite {
     } else {
       this.velocity.y += gravity
     }
+  }
+
+  attack() {
+    this.isAttacking = true
+    setTimeout(() => {
+      this.isAttacking = false
+    }, 100)
   }
 }
 
@@ -57,6 +83,7 @@ const enemy = new Sprite({
     x: 0,
     y: 0,
   },
+  color: 'blue',
 })
 
 console.log(player)
@@ -102,6 +129,18 @@ function animate() {
   } else if (keys.right.pressed && enemy.lastkey === 'right') {
     enemy.velocity.x = 5
   }
+
+  // collision detection
+  if (
+    player.attackBox.position.x + player.attackBox.width >= enemy.position.x &&
+    player.attackBox.position.x <= enemy.position.x + enemy.width && // x axis
+    player.attackBox.position.y + player.attackBox.height >= enemy.position.y &&
+    player.attackBox.position.y <= enemy.position.y + enemy.height && // y axis
+    player.isAttacking
+  ) {
+    player.isAttacking = false
+    console.log('collision')
+  }
 }
 
 animate()
@@ -119,6 +158,9 @@ window.addEventListener('keydown', (event) => {
       break
     case 'w':
       player.velocity.y = -20
+      break
+    case ' ':
+      player.attack()
       break
 
     case 'ArrowRight':
